@@ -15,9 +15,6 @@ class ChromaDB {
             ssl: false
         });
         this.initialize();
-
-
-
     }
 
     async getCollection(): Promise<Collection> {
@@ -48,7 +45,15 @@ class ChromaDB {
             documents: chunks.map(chunk => chunk.content),
             metadatas: chunks.map(chunk => chunk.metadata)
         });
+    }
 
+    async searchEmbeddings(query: number[][]) {
+        const collection = await this.getCollection();
+        const results = await collection.query({
+            queryEmbeddings: query,
+            nResults: 5
+        });
+        return results;
     }
 }
 

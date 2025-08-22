@@ -25,6 +25,13 @@ class Storage {
         }
         await this.storage.storeEmbeddings(embeddings, chunks);
     }
+
+    async searchEmbeddings(query: number[][]) {
+        if (!this.storage) {
+            throw new Error('Storage not initialized');
+        }
+        return await this.storage.searchEmbeddings(query);
+    }
 }
 
 export default Storage;

@@ -10,7 +10,7 @@ const filePath = args[0];
 const embeddingService = new EmbeddingService();
 const storage = new Storage();
 
-const run = async () => {
+const storeEmbeddings = async () => {
     if (!filePath) {
         console.error('Please provide a PDF file path as an argument.');
         process.exit(1);
@@ -24,4 +24,17 @@ const run = async () => {
     console.log('✅ Embeddings stored successfully');
 
 }
-run();
+// storeEmbeddings();
+
+const searchEmbeddings = async () => {
+    const query = args[0];
+    if (!query) {
+        console.error('Please provide a query as an argument.');
+        process.exit(1);
+    }
+    const embeddings = await embeddingService.generateEmbeddings([query]);
+    const results = await storage.searchEmbeddings(embeddings);
+    console.log(results);
+}
+
+searchEmbeddings();
