@@ -1,3 +1,4 @@
+import type { Metadata, QueryResult } from "chromadb";
 import type { DocumentChunk } from "../ocr/types";
 import ChromaDB from "./ChromaDB";
 
@@ -26,7 +27,7 @@ class Storage {
         await this.storage.storeEmbeddings(embeddings, chunks);
     }
 
-    async searchEmbeddings(query: number[][]) {
+    async searchEmbeddings(query: number[][]): Promise<QueryResult<Metadata>> {
         if (!this.storage) {
             throw new Error('Storage not initialized');
         }

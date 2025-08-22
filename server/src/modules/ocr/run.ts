@@ -2,6 +2,8 @@ import EmbeddingService from "../embeddings/EmbeddingService";
 import { main } from "./OCRExtraction";
 import type { DocumentChunk } from "./types";
 import Storage from "../storage";
+import type { Metadata, QueryResult } from "chromadb";
+import RAGSystem from "../RAGSystem";
 
 const args = process.argv.slice(2); // Remove 'bun' and 'script.js'
 
@@ -33,8 +35,22 @@ const searchEmbeddings = async () => {
         process.exit(1);
     }
     const embeddings = await embeddingService.generateEmbeddings([query]);
-    const results = await storage.searchEmbeddings(embeddings);
-    console.log(results);
+    const results: QueryResult<Metadata> = await storage.searchEmbeddings(embeddings);
+
 }
 
-searchEmbeddings();
+// searchEmbeddings();
+
+const makeLLMCall = async () => {
+    const query = args[0];
+    if (!query) {
+        console.error('Please provide a query as an argument.');
+        process.exit(1);
+    }
+    const ragSystem = new RAGSystem();
+    const response = await ragSystem.query(query);
+    console.log(response);
+}
+
+makeLLMCall();
+

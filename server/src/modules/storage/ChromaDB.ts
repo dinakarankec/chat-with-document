@@ -1,4 +1,4 @@
-import { ChromaClient, type Collection } from "chromadb";
+import { ChromaClient, QueryResult, type Collection, type Metadata } from "chromadb";
 import type { DocumentChunk } from "../ocr/types";
 
 class ChromaDB {
@@ -47,7 +47,7 @@ class ChromaDB {
         });
     }
 
-    async searchEmbeddings(query: number[][]) {
+    async searchEmbeddings(query: number[][]): Promise<QueryResult<Metadata>> {
         const collection = await this.getCollection();
         const results = await collection.query({
             queryEmbeddings: query,

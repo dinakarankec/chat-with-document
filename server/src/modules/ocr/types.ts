@@ -21,10 +21,5 @@ export interface QueryResult {
     content: string;
     metadata: any;
     distance?: number;
-}
 
-export interface RAGResponse {
-    answer: string;
-    sources: QueryResult[];
-    query: string;
 }
