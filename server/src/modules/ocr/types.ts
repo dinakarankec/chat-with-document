@@ -14,6 +14,7 @@ export interface DocumentChunk {
         chunk_index: number;
         content_type: 'text' | 'ocr' | 'mixed';
         ocr_confidence?: number;
+        uniqueDocumentId: string;
     };
 }
 

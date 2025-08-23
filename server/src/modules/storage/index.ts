@@ -20,18 +20,32 @@ class Storage {
         }
     }
 
-    async storeEmbeddings(embeddings: number[][], chunks: DocumentChunk[]) {
+    async storeEmbeddingsForDocument(uniqueDocumentId: string, embeddings: number[][], chunks: DocumentChunk[]) {
         if (!this.storage) {
             throw new Error('Storage not initialized');
         }
-        await this.storage.storeEmbeddings(embeddings, chunks);
+        await this.storage.storeEmbeddingsForDocument(uniqueDocumentId, embeddings, chunks);
     }
 
-    async searchEmbeddings(query: number[][]): Promise<QueryResult<Metadata>> {
+    async searchEmbeddings(query: number[][], uniqueDocumentId: string): Promise<QueryResult<Metadata>> {
         if (!this.storage) {
             throw new Error('Storage not initialized');
         }
-        return await this.storage.searchEmbeddings(query);
+        return await this.storage.searchEmbeddings(query, uniqueDocumentId);
+    }
+
+    async viewCollectionIds() {
+        if (!this.storage) {
+            throw new Error('Storage not initialized');
+        }
+        await this.storage.viewCollectionIds();
+    }
+
+    async deleteAllCollection() {
+        if (!this.storage) {
+            throw new Error('Storage not initialized');
+        }
+        await this.storage.deleteAllCollection();
     }
 }
 

@@ -37,23 +37,50 @@ class ChromaDB {
         this.instantiateCollection();
     }
 
-    async storeEmbeddings(embeddings: number[][], chunks: DocumentChunk[]) {
+    async storeEmbeddingsForDocument(uniqueDocumentId: string, embeddings: number[][], chunks: DocumentChunk[]) {
         const collection = await this.getCollection();
         await collection.add({
-            ids: chunks.map(chunk => chunk.id),
+            ids: chunks.map(chunk => `${uniqueDocumentId}-${chunk.id}`),
             embeddings: embeddings,
             documents: chunks.map(chunk => chunk.content),
             metadatas: chunks.map(chunk => chunk.metadata)
         });
     }
 
-    async searchEmbeddings(query: number[][]): Promise<QueryResult<Metadata>> {
+    async searchEmbeddings(query: number[][], uniqueDocumentId: string): Promise<QueryResult<Metadata>> {
         const collection = await this.getCollection();
         const results = await collection.query({
             queryEmbeddings: query,
-            nResults: 5
+            nResults: 10,
+            where: {
+                "uniqueDocumentId": { "$eq": uniqueDocumentId }
+            }
         });
         return results;
+    }
+
+    async viewCollectionIds() {
+        const collection = await this.getCollection();
+
+        const docs = await collection.get({})
+        console.log(docs.ids)
+        return docs.ids
+
+    }
+
+    async deleteAllCollection() {
+        /**
+         * Extremely Catastrophic code, do not use it
+         */
+        const docIds = await this.viewCollectionIds()
+        if (docIds.length > 0) {
+            const collection = await this.getCollection();
+            await collection.delete({
+                ids: docIds
+            })
+            console.log('✅ All documents deleted');
+        }
+
     }
 }
 

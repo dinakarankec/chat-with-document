@@ -22,13 +22,13 @@ class RAGSystem {
 
     async query(
         userQuestion: string,
-        topK: number = 5,
+        uniqueDocumentId: string
     ): Promise<RAGResponse> {
         try {
             // 1. Vector similarity search
             console.log(`Searching for relevant documents for query: ${userQuestion}`);
             const embeddings = await this.embeddingService.generateEmbeddings([userQuestion]);
-            const results: QueryResult<Metadata> = await this.storage.searchEmbeddings(embeddings);
+            const results: QueryResult<Metadata> = await this.storage.searchEmbeddings(embeddings, uniqueDocumentId);
 
 
             // 2. Prepare context

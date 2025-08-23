@@ -7,50 +7,70 @@ import RAGSystem from "../RAGSystem";
 
 const args = process.argv.slice(2); // Remove 'bun' and 'script.js'
 
-const filePath = args[0];
+
 
 const embeddingService = new EmbeddingService();
 const storage = new Storage();
 
 const storeEmbeddings = async () => {
+    const uniqueDocumentId = args[0] || "Acct_Statement_current_financial_year_from_hardcoded.pdf";
+    const filePath = args[1];
     if (!filePath) {
         console.error('Please provide a PDF file path as an argument.');
         process.exit(1);
     }
 
-    const chunks: DocumentChunk[] = await main(filePath);
+    const chunks: DocumentChunk[] = await main(filePath, uniqueDocumentId);
+
+    console.log(chunks);
 
     const embeddings = await embeddingService.generateEmbeddingsForChunks(chunks);
 
-    await storage.storeEmbeddings(embeddings, chunks);
+    await storage.storeEmbeddingsForDocument(uniqueDocumentId, embeddings, chunks);
     console.log('✅ Embeddings stored successfully');
 
 }
 // storeEmbeddings();
 
 const searchEmbeddings = async () => {
-    const query = args[0];
+    const uniqueDocumentId = args[0] || ''
+    const query = args[1];
+    console.log(uniqueDocumentId, query);
     if (!query) {
         console.error('Please provide a query as an argument.');
         process.exit(1);
     }
     const embeddings = await embeddingService.generateEmbeddings([query]);
-    const results: QueryResult<Metadata> = await storage.searchEmbeddings(embeddings);
-
+    console.log(embeddings);
+    const results: QueryResult<Metadata> = await storage.searchEmbeddings(embeddings, uniqueDocumentId);
+    console.log(results);
 }
 
 // searchEmbeddings();
 
 const makeLLMCall = async () => {
-    const query = args[0];
+    const uniqueDocumentId = args[0] || ''
+    const query = args[1];
     if (!query) {
         console.error('Please provide a query as an argument.');
         process.exit(1);
     }
     const ragSystem = new RAGSystem();
-    const response = await ragSystem.query(query);
+    const response = await ragSystem.query(query, uniqueDocumentId);
     console.log(response);
 }
-
 makeLLMCall();
+
+const viewCollectionIds = async () => {
+    await storage.viewCollectionIds();
+}
+// viewCollectionIds();
+
+const deleteAllCollection = async () => {
+    await storage.deleteAllCollection();
+}
+// deleteAllCollection();
+
+
+
 

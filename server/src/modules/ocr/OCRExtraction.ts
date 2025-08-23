@@ -51,7 +51,7 @@ class OCRExtraction {
         }
     }
 
-    async convertPDFToImages(pdfPath: string): Promise<string[]> {
+    async convertPDFToImages(pdfPath: string, uniqueDocumentId: string): Promise<string[]> {
         try {
             const convert = pdf2pic.fromPath(pdfPath, {
                 density: 300,           // High DPI for better OCR
@@ -138,7 +138,7 @@ class OCRExtraction {
         }
     }
 
-    async extractTextFromPDF(pdfPath: string): Promise<Document[]> {
+    async extractTextFromPDF(pdfPath: string, uniqueDocumentId: string): Promise<Document[]> {
         try {
             console.log('📄 Extracting text from PDF...');
 
@@ -150,7 +150,7 @@ class OCRExtraction {
 
             // Convert PDF to images for OCR
             console.log('🖼️ Converting PDF to images for OCR...');
-            const imagePaths = await this.convertPDFToImages(pdfPath);
+            const imagePaths = await this.convertPDFToImages(pdfPath, uniqueDocumentId);
 
             const enhancedDocs: Document[] = [];
 
@@ -228,7 +228,7 @@ class OCRExtraction {
         }
     }
 
-    async chunkDocuments(documents: Document[]): Promise<DocumentChunk[]> {
+    async chunkDocuments(documents: Document[], uniqueDocumentId: string): Promise<DocumentChunk[]> {
         const textSplitter = new RecursiveCharacterTextSplitter({
             chunkSize: 1000,
             chunkOverlap: 200,
@@ -250,7 +250,8 @@ class OCRExtraction {
                         page: doc.metadata.page || undefined,
                         chunk_index: globalChunkIndex,
                         content_type: doc.metadata.content_type || 'text',
-                        ocr_confidence: doc.metadata.ocr_confidence
+                        ocr_confidence: doc.metadata.ocr_confidence,
+                        uniqueDocumentId: uniqueDocumentId
                     }
                 });
                 globalChunkIndex++;
@@ -261,12 +262,12 @@ class OCRExtraction {
         return chunks;
     }
 
-    async extractChunksFromPDF(pdfPath: string): Promise<DocumentChunk[]> {
+    async extractChunksFromPDF(pdfPath: string, uniqueDocumentId: string): Promise<DocumentChunk[]> {
         console.log(`🚀 Starting enhanced indexing of PDF: ${pdfPath}`);
 
         try {
-            const documents = await this.extractTextFromPDF(pdfPath);
-            const chunks = await this.chunkDocuments(documents);
+            const documents = await this.extractTextFromPDF(pdfPath, uniqueDocumentId);
+            const chunks = await this.chunkDocuments(documents, uniqueDocumentId);
 
             if (chunks.length === 0) {
                 throw new Error('No content extracted from PDF');
@@ -302,7 +303,7 @@ class OCRExtraction {
 }
 
 // Usage example
-export async function main(filePath: string): Promise<DocumentChunk[]> {
+export async function main(filePath: string, uniqueDocumentId: string): Promise<DocumentChunk[]> {
     const ocrExtraction = new OCRExtraction(
         {
             engine: 'tesseract',
@@ -317,10 +318,10 @@ export async function main(filePath: string): Promise<DocumentChunk[]> {
         const pdfPath = filePath;
 
         if (fs.existsSync(pdfPath)) {
-            return await ocrExtraction.extractChunksFromPDF(pdfPath);
+            return await ocrExtraction.extractChunksFromPDF(pdfPath, uniqueDocumentId);
+        } else {
+            throw new Error('File not found');
         }
-
-        return [];
     } catch (error) {
         console.error('Error:', error);
     } finally {
