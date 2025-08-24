@@ -1,6 +1,6 @@
 import type { Metadata, QueryResult } from "chromadb";
 import type { DocumentChunk } from "../ocr/types";
-import type { ContextChunk } from "./type";
+import type { ContextChunk, OpenRouterRequest } from "./type";
 
 class RAGUtils {
     static prepareContextFromVectorResults(
@@ -59,6 +59,23 @@ class RAGUtils {
     6. If its about Financial query respond amount details in INR
     7. You don't have to mention anything about the context source in your answer
     **Answer:`;
+    }
+
+
+    static getSystemPromptForInDocumentSearch(uniqueDocumentId: string): string {
+        return `You are an Helpful AI assistant, check your knowledge base before answering any question 
+            
+        **Relevant Context:**
+        UniqueDocumentId: ${uniqueDocumentId}
+        
+        **Instructions:**
+        1. Answer the user's question using ONLY the information provided in the given context, you don't have to mention anything about the context source in your answer
+        2. If the context doesn't contain enough information to answer the question, clearly state it to the user
+        3. Use the relavant tools to fetch the information and use it to answer the user's question
+        4. Be specific and accurate - don't make assumptions beyond what's in the context
+        5. If you find conflicting information in different context sections, mention this
+        6. If its about Financial query respond amount details in INR
+        7. You don't have to mention anything about the context source in your answer`;
     }
 }
 

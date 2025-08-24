@@ -47,11 +47,11 @@ class ChromaDB {
         });
     }
 
-    async searchEmbeddings(query: number[][], uniqueDocumentId: string): Promise<QueryResult<Metadata>> {
+    async searchEmbeddings(query: number[][], uniqueDocumentId: string, topK: number): Promise<QueryResult<Metadata>> {
         const collection = await this.getCollection();
         const results = await collection.query({
             queryEmbeddings: query,
-            nResults: 10,
+            nResults: topK,
             where: {
                 "uniqueDocumentId": { "$eq": uniqueDocumentId }
             }

@@ -4,12 +4,14 @@ import Storage from "../storage";
 import RAGUtils from './RAGUtils';
 import type { RAGResponse } from "./type";
 import LLMClient from "./LLMClient";
+import LLMClientV2 from "./LLMClientV2/LLMClientV2";
 
 class RAGSystem {
     private embeddingService: EmbeddingService;
     private storage: Storage;
     private relevanceThreshold: number;
     private llmClient: LLMClient;
+    private llmClientV2: LLMClientV2;
 
     constructor(
         relevanceThreshold: number = 1.5
@@ -18,6 +20,7 @@ class RAGSystem {
         this.embeddingService = new EmbeddingService();
         this.relevanceThreshold = relevanceThreshold;
         this.llmClient = new LLMClient();
+        this.llmClientV2 = new LLMClientV2();
     }
 
     async query(
@@ -70,6 +73,12 @@ class RAGSystem {
             console.error('RAG System Error:', error);
             throw new Error(`RAG system failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
+    }
+
+    async createAgenticQuery(userQuery: string, uniqueDocumentId: string) {
+        const systemPrompt = RAGUtils.getSystemPromptForInDocumentSearch(uniqueDocumentId);
+        const response = await this.llmClientV2.chat(userQuery, systemPrompt);
+        // console.log(response);
     }
 };
 

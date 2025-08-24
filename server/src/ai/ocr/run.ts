@@ -46,7 +46,6 @@ const searchEmbeddings = async () => {
     console.log(results);
 }
 
-// searchEmbeddings();
 
 const makeLLMCall = async () => {
     const uniqueDocumentId = args[0] || ''
@@ -59,17 +58,34 @@ const makeLLMCall = async () => {
     const response = await ragSystem.query(query, uniqueDocumentId);
     console.log(response);
 }
-makeLLMCall();
 
 const viewCollectionIds = async () => {
     await storage.viewCollectionIds();
 }
-// viewCollectionIds();
 
 const deleteAllCollection = async () => {
     await storage.deleteAllCollection();
 }
+
+const makeAgenticQuery = async () => {
+    const uniqueDocumentId = args[0] || ''
+    const query = args[1];
+    if (!query) {
+        console.error('Please provide a query as an argument.');
+        process.exit(1);
+    }
+    const ragSystem = new RAGSystem();
+    const response = await ragSystem.createAgenticQuery(query, uniqueDocumentId);
+    // console.log(response);
+}
+
+
+// storeEmbeddings();
+// searchEmbeddings();
+// makeLLMCall();
+// viewCollectionIds();
 // deleteAllCollection();
+makeAgenticQuery();
 
 
 

@@ -27,18 +27,18 @@ class Storage {
         await this.storage.storeEmbeddingsForDocument(uniqueDocumentId, embeddings, chunks);
     }
 
-    async searchEmbeddings(query: number[][], uniqueDocumentId: string): Promise<QueryResult<Metadata>> {
+    async searchEmbeddings(query: number[][], uniqueDocumentId: string, topK: number = 5): Promise<QueryResult<Metadata>> {
         if (!this.storage) {
             throw new Error('Storage not initialized');
         }
-        return await this.storage.searchEmbeddings(query, uniqueDocumentId);
+        return await this.storage.searchEmbeddings(query, uniqueDocumentId, topK);
     }
 
     async viewCollectionIds() {
         if (!this.storage) {
             throw new Error('Storage not initialized');
         }
-        await this.storage.viewCollectionIds();
+        return await this.storage.viewCollectionIds();
     }
 
     async deleteAllCollection() {
